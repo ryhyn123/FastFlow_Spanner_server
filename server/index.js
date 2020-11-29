@@ -136,6 +136,27 @@ app.get('/user', (req, res) => {
 //////로그인 test end
 
 
+//signout start
+app.delete("/user/signout", (req, res) => {
+  if (req.session.userid) {
+    req.session.destroy(() => {
+      res.status(205).send('success logout')
+    });
+  }
+  });
+//signout end
+
+
+
+
+
+
+
+
+
+
+
+
 app.get('/', (req, res) => {
   
   post.findAll().then(data=> res.status(200).send(data))
