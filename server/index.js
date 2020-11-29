@@ -69,8 +69,71 @@ app.post('/user/signup', (req, res) => {
 //signup end
 
 
+//signin start
 
+app.post("/user/signin", (req, res) => {
 
+    const {email, password} = req.body;
+
+  const salt = Math.round((new Date().valueOf() * Math.random))
+  const hashPwd = crypto.createHash("sha256").update(password+salt).digest("hex") 
+
+    req
+        .session
+        .regenerate(() => {
+            user
+                .findOne({
+                    where: {
+                        email: email,
+                        // password: password
+                        password: hashPwd
+                    }
+                })
+                .then((data) => {
+                  console.log(data.id)
+                    if (!data) {
+                        return res
+                            .status(404)
+                            .send("invalid user / 이미있는유저(delete)");
+                    }
+                    req.session.userid = data.id;
+                    res
+                        .status(200)
+                        .json(data
+                          // {
+                          //   id: data.id, email: data.email, username: data.username, profile_image: data.profile_image, createdAt: data.createdAt, updatedAt: data.updatedAt,
+                          // session:req.session.userid}
+                        );
+                })
+                .catch((err) => {
+                    res
+                        .status(404)
+                        .send(err);
+                });
+        });
+});
+//signin end
+
+////////로그인 test start
+app.get('/user', (req, res) => {
+  if (req.session.userid) {
+
+     user
+                .findOne({
+                    where: {
+                        id: req.session.userid,
+                    }
+                })
+       .then((result) => {
+         return res.status(200).json(result);
+       }) 
+      .catch(err => {
+        console.error(err);
+        res.sendStatus(500); // Server error
+      });
+  }
+  })
+//////로그인 test end
 
 
 app.get('/', (req, res) => {
