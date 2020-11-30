@@ -6,8 +6,8 @@ const {post} = require('./models');
 const { invention } = require('./models');
 const bodyParser = require("body-parser");
 const cors = require("cors");
-const session = require("express-session");
 const crypto = require("crypto")
+const jwt = require('jsonwebtoken')
 
 //middleware start
 app.use(bodyParser.json());
@@ -20,13 +20,6 @@ app.use(
   })
 );
 
-app.use(
-  session({
-    secret: "@korealand",
-    resave: false,
-    saveUninitialized: true,
-  })
-);
 //middleware end
 
 
@@ -34,8 +27,10 @@ app.use(
 app.post('/user/signup', (req, res) => {
 
   const { email, password, username } = req.body;
-  const salt = Math.round((new Date().valueOf()*Math.random))
+  
+    const salt = Math.round((new Date().valueOf()*Math.random))
   const hashPwd = crypto.createHash("sha256").update(password+salt).digest("hex") 
+
 
     user
         .findOrCreate({
@@ -70,7 +65,6 @@ app.post('/user/signup', (req, res) => {
 
 
 //signin start
-
 app.post("/user/signin", (req, res) => {
 
     const {email, password} = req.body;
@@ -78,50 +72,66 @@ app.post("/user/signin", (req, res) => {
   const salt = Math.round((new Date().valueOf() * Math.random))
   const hashPwd = crypto.createHash("sha256").update(password+salt).digest("hex") 
 
-    req
-        .session
-        .regenerate(() => {
-            user
-                .findOne({
-                    where: {
-                        email: email,
-                        // password: password
-                        password: hashPwd
-                    }
-                })
-                .then((data) => {
-                  console.log(data.id)
-                    if (!data) {
-                        return res
-                            .status(404)
-                            .send("invalid user / 이미있는유저(delete)");
-                    }
-                    req.session.userid = data.id;
-                    res
-                        .status(200)
-                        .json(data
-                          // {
-                          //   id: data.id, email: data.email, username: data.username, profile_image: data.profile_image, createdAt: data.createdAt, updatedAt: data.updatedAt,
-                          // session:req.session.userid}
-                        );
+          user
+            .findOne({
+              where: {
+                email: email,
+                password: hashPwd
+              }
+            })
+            .then((data) => {
+              console.log(data.id)
+              if (!data) {
+                return res
+                  .status(404)
+                  .send("exist user");
+              } else { 
+                const accessToken = jwt.sign({ email: email, userId: data.id }, 'secret', { expiresIn: '600s' })
+                
+              res.status(200).json({loginSuccess: true, msg: '토큰발급성공', accessToken: accessToken, id: data.id })
+            }
                 })
                 .catch((err) => {
                     res
                         .status(404)
                         .send(err);
                 });
-        });
 });
 //signin end
 
-////////로그인 test start
-app.get('/user', (req, res) => {
-  if (req.session.userid) {
 
+// JWT middleware start 
+function authenticateToken(req, res, next) {
+    const authHeader = req.headers['authorization']
+  const token = authHeader && authHeader.split(' ')[1]
+  console.log('토큰=>', token)
+    if (token === null) {
+        console.log('토큰없다')
+        return res.sendStatus(401)
+    } else {
+        jwt.verify(token, 'secret', (err, user) => {
+            if (err) {
+                console.log('토큰에러');
+                return res.sendStatus(403)
+            } else {
+              console.log('정상토큰이다 ㅋㅋ')
+              console.log(user) //토큰 페이로드
+              req.user = user
+            next()
+            }
+        })
+    }
+}
+// JWT middleware End
+
+
+//signin test start
+app.get('/user', authenticateToken, (req, res) => {
+ 
      user
                 .findOne({
                     where: {
-                        id: req.session.userid,
+                        id: req.user.userId,
                     }
                 })
        .then((result) => {
@@ -131,18 +141,13 @@ app.get('/user', (req, res) => {
         console.error(err);
         res.sendStatus(500); // Server error
       });
-  }
   })
-//////로그인 test end
+//signin test end
 
 
 //signout start
-app.delete("/user/signout", (req, res) => {
-  if (req.session.userid) {
-    req.session.destroy(() => {
+app.delete("/user/signout", authenticateToken, (req, res) => {
       res.status(205).send('success logout')
-    });
-  }
   });
 //signout end
 
