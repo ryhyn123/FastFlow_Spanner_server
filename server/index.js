@@ -1,6 +1,6 @@
 const express = require('express')
 const app = express()
-const port = 3000
+const port = 80
 const {user} = require('./models');
 const {post} = require('./models');
 const { invention } = require('./models');
