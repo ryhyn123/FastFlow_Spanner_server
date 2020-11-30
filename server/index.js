@@ -152,6 +152,37 @@ app.delete("/user/signout", authenticateToken, (req, res) => {
 //signout end
 
 
+//post read start
+app.get('/post/read', (req, res) => {
+  post
+        .findAll({
+             
+            include: [
+                {
+                    model: user,
+                    required: false,
+                    attributes: ['email','username', 'userPhoto']
+                }, {
+                    model: invention,
+                    required: false,
+                    attributes: ['id','title','text', 'inventionPhoto']
+                }
+            ],
+            raw: true, 
+            nest: true, 
+        })
+        .then(data => {
+            console.log(data);
+            return res
+                .status(200)
+                .send(data);
+        })
+        .catch(err => {
+            console.error(err);
+            res.sendStatus(500); 
+        });
+ })
+//post read end
 
 
 
