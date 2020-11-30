@@ -331,7 +331,6 @@ password:hashPwd
 
 //profile(account) delete start
 app.delete('/profile/delete', authenticateToken,(req, res) => {
-
     user.destroy({
     where:{id:req.user.userId}//
   })
@@ -344,6 +343,26 @@ app.delete('/profile/delete', authenticateToken,(req, res) => {
   })
 })
 //profile delete end
+
+
+//profile username edit start
+app.put('/profile/edit/username', authenticateToken,(req, res) => {
+    user.update({
+username:req.body.username  
+    }, {
+    where: { id:req.user.userId  }    
+  })
+ .then(result => {
+     res.json(result);
+  })
+  .catch(err => {
+     console.error(err);
+     console.log('username 변경 성공 ㅋㅋㅋ')
+  });
+    
+});
+//profile username edit end
+
 
 
 
