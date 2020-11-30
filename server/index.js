@@ -364,7 +364,7 @@ username:req.body.username
 //profile username edit end
 
 
-//profile photo upload start(+setting)
+//profile photo upload and edit start(+setting)
 const _storageprofile = multer.diskStorage({
     destination: (req, file, cb) => {
       cb(null, 'uploadProfile/');
@@ -391,8 +391,24 @@ app.put('/profile/upload', authenticateToken, uploadProfile.single('image'), (re
     .catch((err) =>
     console.log('에러뜸'))
    })
+//profile photo upload and edit end
 
 
+//profile photo delete start
+app.put('/profile/upload/delete', authenticateToken, (req, res) => {//엔포,미들웨어    
+  user
+    .update({
+      userPhoto:null
+    }, {where:{id: req.user.userId
+}})
+    .then((data) => { 
+      console.log(data)
+      res.status(200).send(data)
+    })
+    .catch((err) =>
+    console.log('에러뜸'))
+   })
+//profile photo delete end
 
 
 
