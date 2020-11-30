@@ -185,6 +185,20 @@ app.get('/post/read', (req, res) => {
 //post read end
 
 
+//post write start
+app.post('/post/write', authenticateToken,(req, res) => {  
+    post.
+    create({
+      text: req.body.text,
+      title: req.body.title,
+      userId: req.user.userId,
+      inventionId: req.body.postInfo 
+    })
+    .then((data) => {
+      res.status(201).json(data)
+    })   .catch((err) => { res.status(500).send('글쓰기 에러ㅋㅋ') })    
+  })
+//post write end
 
 
 
