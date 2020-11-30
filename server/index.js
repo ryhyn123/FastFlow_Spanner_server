@@ -329,6 +329,22 @@ password:hashPwd
 //profile password edit end
 
 
+//profile(account) delete start
+app.delete('/profile/delete', authenticateToken,(req, res) => {
+
+    user.destroy({
+    where:{id:req.user.userId}//
+  })
+    .then((data) => {
+    res.redirect('/')
+    })
+    .catch(err => {
+     console.error(err);
+    console.log('계정삭제 실패 ㅋㅋ')
+  })
+})
+//profile delete end
+
 
 
 app.get('/', (req, res) => {
