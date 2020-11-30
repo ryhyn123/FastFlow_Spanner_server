@@ -8,6 +8,7 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const crypto = require("crypto")
 const jwt = require('jsonwebtoken')
+const multer = require('multer')
 
 //middleware start
 app.use(bodyParser.json());
@@ -237,7 +238,40 @@ app.delete('/post/delete',authenticateToken, (req, res) => {
 //post delete end
 
 
+//post photo upload and edit start
+ const _storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+      cb(null, 'uploadPost/');
+    },
+    filename: (req, file, cb) => {
+     cb(null, Date.now() +"-"+ file.originalname);
+    },
+  })
+const upload = multer({storage: _storage})//목적지
+  
 
+app.use('/uploadPost', express.static('uploadPost'));
+
+app.put('/post/upload', authenticateToken, upload.single('image'), (req, res) => {//엔포,미들웨어
+
+  console.log('멀터 =>', req.body)
+
+  post
+    .update({
+      postPhoto:'uploadPost/'+req.file.filename
+    },
+      {
+        where: {
+          id: req.body.postId, userId: req.user.userId, inventionId: req.body.postInfo
+}})
+    .then((data) => { 
+      console.log(data)
+      res.status(200).send(data)
+    })
+    .catch((err) =>
+    console.log('에러뜸'))
+})
+//post photo upload and edit end
 
 app.get('/', (req, res) => {
   
