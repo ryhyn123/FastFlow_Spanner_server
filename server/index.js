@@ -211,16 +211,30 @@ app.put('/post/edit', authenticateToken,(req, res) => {
     where: { id:req.body.postId, userId:req.user.userId, inventionId:req.body.inventionId }
   })
  .then(result => {
-     res.json(result);
+     res.status(201).json(result);
   })
   .catch(err => {
      console.error(err);
-     console.log('글수정 성공 ㅋ')
+     console.log('글수정 실패 ㅋ')
   });
 });
 //post edit end
 
 
+//post delete start //클라이언트 님, 227번 where는 해당 post의 id 값을 꼭 필요로 합니다. inventionId 도 보내주세욥
+app.delete('/post/delete',authenticateToken, (req, res) => {
+    post.destroy({
+     where: { id:req.body.postId, userId:req.user.userId, inventionId:req.body.inventionId }
+  })
+    .then(() => {
+    res.status(201).send('success delete');
+    })
+    .catch(err => {
+     console.error(err);
+    console.log('글삭제 실패 ㅋㅋ')
+  })
+    })
+//post delete end
 
 
 
