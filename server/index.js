@@ -293,6 +293,23 @@ app.put('/post/upload/delete', authenticateToken, (req, res) => {//엔포,미들
 //post photo delete end
 
 
+//profile read start
+app.get('/profile/read', authenticateToken,(req, res) => {
+     user
+                .findOne({
+                    where: {
+                        id: req.user.userId,
+                    }
+                })
+       .then((result) => {
+         return res.status(200).json(result);
+       }) 
+      .catch(err => {
+        console.error(err);
+        res.sendStatus(500); 
+      });
+  })
+//profile read end
 
 
 app.get('/', (req, res) => {
