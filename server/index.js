@@ -202,7 +202,7 @@ app.post('/post/write', authenticateToken,(req, res) => {
 //post write end
 
 
-//post edit start //클라이언트 님, 211번 where는 해당 post의 id 값을 꼭 필요로 합니다. inventionId 도 보내주세욥
+//post edit start  
 app.put('/post/edit', authenticateToken,(req, res) => {
     post.update({
     text: req.body.text, 
@@ -222,7 +222,7 @@ app.put('/post/edit', authenticateToken,(req, res) => {
 //post edit end
 
 
-//post delete start //클라이언트 님, 227번 where는 해당 post의 id 값을 꼭 필요로 합니다. inventionId 도 보내주세욥
+//post delete start  
 app.delete('/post/delete',authenticateToken, (req, res) => {
     post.destroy({
      where: { id:req.body.postId, userId:req.user.userId, inventionId:req.body.inventionId }
@@ -272,6 +272,28 @@ app.put('/post/upload', authenticateToken, upload.single('image'), (req, res) =>
     console.log('에러뜸'))
 })
 //post photo upload and edit end
+
+
+//post photo delete start
+app.put('/post/upload/delete', authenticateToken, (req, res) => {//엔포,미들웨어
+  post
+    .update({
+      postPhoto:null
+    }, {
+      where: {
+        id: req.body.postId, userId: req.user.userId, inventionId: req.body.postInfo
+}})
+    .then((data) => { 
+      console.log(data)
+      res.status(200).send(data)
+    })
+    .catch((err) =>
+    console.log('에러뜸'))
+})
+//post photo delete end
+
+
+
 
 app.get('/', (req, res) => {
   
