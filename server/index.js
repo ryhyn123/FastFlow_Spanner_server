@@ -364,6 +364,40 @@ username:req.body.username
 //profile username edit end
 
 
+//profile photo upload start(+setting)
+const _storageprofile = multer.diskStorage({
+    destination: (req, file, cb) => {
+      cb(null, 'uploadProfile/');
+    },
+    filename: (req, file, cb) => {
+     cb(null, Date.now() +"-"+ file.originalname);
+    },
+  })
+const uploadProfile = multer({storage: _storageprofile})//목적지
+  
+app.use('/uploadProfile', express.static('uploadProfile'));
+
+app.put('/profile/upload', authenticateToken, uploadProfile.single('image'), (req, res) => {//엔포,미들웨어
+
+  user
+    .update({
+      userPhoto:'uploadProfile/'+req.file.filename
+    }, {where:{id: req.user.userId
+}})
+    .then((data) => { 
+      console.log(data)
+      res.status(200).send(data)
+    })
+    .catch((err) =>
+    console.log('에러뜸'))
+   })
+
+
+
+
+
+
+
 
 
 app.get('/', (req, res) => {
