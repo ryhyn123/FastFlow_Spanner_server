@@ -10,6 +10,7 @@ const crypto = require("crypto")
 const jwt = require('jsonwebtoken')
 const multer = require('multer')
 
+
 //middleware start
 app.use(bodyParser.json());
 
@@ -20,7 +21,6 @@ app.use(
     credentials: true,
   })
 );
-
 //middleware end
 
 
@@ -28,10 +28,8 @@ app.use(
 app.post('/user/signup', (req, res) => {
 
   const { email, password, username } = req.body;
-  
-    const salt = Math.round((new Date().valueOf()*Math.random))
+      const salt = Math.round((new Date().valueOf()*Math.random))
   const hashPwd = crypto.createHash("sha256").update(password+salt).digest("hex") 
-
 
     user
         .findOrCreate({
@@ -238,7 +236,7 @@ app.delete('/post/delete',authenticateToken, (req, res) => {
 //post delete end
 
 
-//post photo upload and edit start
+//post photo upload and edit start (+setting)
  const _storage = multer.diskStorage({
     destination: (req, file, cb) => {
       cb(null, 'uploadPost/');
@@ -249,13 +247,9 @@ app.delete('/post/delete',authenticateToken, (req, res) => {
   })
 const upload = multer({storage: _storage})//목적지
   
-
 app.use('/uploadPost', express.static('uploadPost'));
 
 app.put('/post/upload', authenticateToken, upload.single('image'), (req, res) => {//엔포,미들웨어
-
-  console.log('멀터 =>', req.body)
-
   post
     .update({
       postPhoto:'uploadPost/'+req.file.filename
@@ -310,6 +304,31 @@ app.get('/profile/read', authenticateToken,(req, res) => {
       });
   })
 //profile read end
+
+
+//profile password edit start
+app.put('/profile/edit/password', authenticateToken,(req, res) => {
+ 
+    const salt = Math.round((new Date().valueOf() * Math.random))
+  const hashPwd = crypto.createHash("sha256").update(req.body.password+salt).digest("hex") 
+
+    user.update({
+password:hashPwd 
+    }, {
+    where: { id:req.user.userId  } 
+  })
+ .then(result => {
+     res.json(result);
+  })
+  .catch(err => {
+     console.error(err);
+     console.log('비번번경 성공 ㅋㅋㅋ')
+  });
+    
+});
+//profile password edit end
+
+
 
 
 app.get('/', (req, res) => {
