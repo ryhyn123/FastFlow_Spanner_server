@@ -411,7 +411,21 @@ app.put('/profile/upload/delete', authenticateToken, (req, res) => {//엔포,미
 //profile photo delete end
 
 
-
+//invention read start
+app.get('/invention', (req, res) => {
+  invention.findAll()
+                     .then(data => {
+            console.log(data);
+            return res
+                .status(200)
+                .send(data);
+        })
+        .catch(err => {
+            console.error(err);
+            res.sendStatus(500); // Server error
+        });
+})
+//invention read end
 
 
 
