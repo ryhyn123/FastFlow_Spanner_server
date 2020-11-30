@@ -201,6 +201,24 @@ app.post('/post/write', authenticateToken,(req, res) => {
 //post write end
 
 
+//post edit start //클라이언트 님, 211번 where는 해당 post의 id 값을 꼭 필요로 합니다. inventionId 도 보내주세욥
+app.put('/post/edit', authenticateToken,(req, res) => {
+    post.update({
+    text: req.body.text, 
+    title: req.body.title,
+    postPhoto: req.body.postPhoto
+  }, {
+    where: { id:req.body.postId, userId:req.user.userId, inventionId:req.body.inventionId }
+  })
+ .then(result => {
+     res.json(result);
+  })
+  .catch(err => {
+     console.error(err);
+     console.log('글수정 성공 ㅋ')
+  });
+});
+//post edit end
 
 
 
