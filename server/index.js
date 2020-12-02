@@ -1,6 +1,6 @@
 const express = require('express')
 const app = express()
-const port = 80
+const port = 443
 const {user} = require('./models');
 const {post} = require('./models');
 const { invention } = require('./models');
@@ -15,14 +15,9 @@ require("dotenv").config();
 
 //https test start
 
-// const options = {
-//   key : fs.readFileSync(__dirname + '/pem/key.pem'),
-//   cert : fs.readFileSync(__dirname + '/pem/cert.pem')
-// }
-
 const options = {
-  key : process.env.PEM_KEY,
-  cert : process.env.PEM_CERT
+  key : fs.readFileSync(__dirname + '/pem/key.pem'),
+  cert : fs.readFileSync(__dirname + '/pem/cert.pem')
 }
 
 //https test end
