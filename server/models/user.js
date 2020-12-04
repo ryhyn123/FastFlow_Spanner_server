@@ -21,6 +21,7 @@ module.exports = (sequelize, DataTypes) => {
     email: DataTypes.STRING,
     password: DataTypes.STRING,
     userPhoto: DataTypes.STRING,
+    refreshToken:DataTypes.STRING,
     is_social: DataTypes.BOOLEAN,
     is_active: DataTypes.BOOLEAN,
         createdAt:{type:DataTypes.INTEGER, defaultValue: sequelize.fn('NOW')},
