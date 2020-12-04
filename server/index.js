@@ -3,7 +3,7 @@ const app = express()
 const port = 3000
 const {user} = require('./models');
 const {post} = require('./models');
-const { invention } = require('./models');
+const {invention} = require('./models');
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const crypto = require("crypto")
@@ -11,31 +11,32 @@ const jwt = require('jsonwebtoken')
 const multer = require('multer')
 
 
-
-
 //middleware start
 app.use(bodyParser.raw());
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false}));
+app.use(bodyParser.urlencoded({extended: false}));
 
-app.use(
-  cors({
-     // origin: ["http://spanner.s3-website.ap-northeast-2.amazonaws.com"],
-      
-      origin: ["http://localhost:3001"],
-  method: ["GET", "POST", "PUT", "DELETE"],
-    credentials: true,
-  })
-);
-//middleware end
+app.use(cors({
+    // origin: ["http://spanner.s3-website.ap-northeast-2.amazonaws.com"],
+
+    origin: ["http://localhost:3001"],
+    method: [
+        "GET", "POST", "PUT", "DELETE"
+    ],
+    credentials: true
+}));
+//middleware end 
 
 
 //signup start
 app.post('/user/signup', (req, res) => {
 
-  const { email, password, username } = req.body;
-      const salt = Math.round((new Date().valueOf()*Math.random))
-  const hashPwd = crypto.createHash("sha256").update(password+salt).digest("hex") 
+    const {email, password, username} = req.body;
+    const salt = Math.round((new Date().valueOf() * Math.random))
+    const hashPwd = crypto
+        .createHash("sha256")
+        .update(password + salt)
+        .digest("hex")
 
     user
         .findOrCreate({
@@ -52,21 +53,26 @@ app.post('/user/signup', (req, res) => {
             if (!created) {
                 return res
                     .status(409)
-                    .send('invalid email / 이미 있는 이메일(나중삭제)')
+                    .send("Email already exists")
             } else {
                 const data = await user.get({plain: true});
+                const sendData = {
+                    id: data.id,
+                    username: data.username,
+                    email: data.email
+                }
                 res
                     .status(201)
-                    .json(data);
+                    .json(sendData);
             }
         })
         .catch(err => {
-            console.log('회원가입 오류뜸 (나중삭제)');
-            console.error(err);
-            res.sendStatus(500); // Server error
+            res
+                .status(404)
+                .send(err);
         });
 })
-//signup end
+//signup end 
 
 
 //signin start
@@ -74,140 +80,172 @@ app.post("/user/signin", (req, res) => {
 
     const {email, password} = req.body;
 
-  const salt = Math.round((new Date().valueOf() * Math.random))
-  const hashPwd = crypto.createHash("sha256").update(password+salt).digest("hex") 
+    const salt = Math.round((new Date().valueOf() * Math.random))
+    const hashPwd = crypto
+        .createHash("sha256")
+        .update(password + salt)
+        .digest("hex")
 
-          user
-            .findOne({
-              where: {
+    user
+        .findOne({
+            where: {
                 email: email,
                 password: hashPwd
-              }
-            })
-            .then((data) => {
-              console.log(data.id)
-              if (!data) {
+            }
+        })
+        .then((data) => {
+            if (!data) {
                 return res
-                  .status(404)
-                  .send("exist user");
-              } else { 
-                const accessToken = jwt.sign({ email: email, userId: data.id }, 'secret', { expiresIn: '600s' })
-                
-                  const refreshToken = jwt.sign({ email: email, userId:data.id }, 'secretRefresh', { expiresIn: '1d' })
+                    .status(404)
+                    .send("Couldn't find the User");
+            } else {
+                const accessToken = jwt.sign({
+                    email: email,
+                    userId: data.id
+                }, 'secret', {expiresIn: '600s'})
+
+                const refreshToken = jwt.sign({
+                    email: email,
+                    userId: data.id
+                }, 'secretRefresh', {expiresIn: '1d'})
 
                 user.update({
-                  refreshToken:refreshToken
-                }, {where:{id:data.id}})
-
-
-              res.status(200).json({loginSuccess: true, msg: '토큰발급성공', accessToken: accessToken, refreshToken: refreshToken, id: data.id })
-            }
+                    refreshToken: refreshToken
+                }, {
+                    where: {
+                        id: data.id
+                    }
                 })
-                .catch((err) => {
-                    res
-                        .status(404)
-                        .send(err);
-                });
+
+                const sendData = {
+                    id: data.id,
+                    username: data.username,
+                    email: data.email,
+                    userPhoto: data.userPhoto,
+                    loginSuccess: true,
+                    msg: '토큰발급성공',
+                    accessToken: accessToken,
+                    refreshToken: refreshToken
+                }
+                res
+                    .status(200)
+                    .json(sendData)
+            }
+        })
+        .catch((err) => {
+            res
+                .status(500)
+                .send(err);
+        });
 });
-//signin end
+//signin end 
 
 
-// JWT middleware start 
+//JWT middleware start
 function authenticateToken(req, res, next) {
     const authHeader = req.headers['authorization']
-  const token = authHeader && authHeader.split(' ')[1]
-  console.log('토큰=>', token)
+    const token = authHeader && authHeader.split(' ')[1]
     if (token === null) {
-        console.log('토큰없다')
         return res.sendStatus(401)
     } else {
         jwt.verify(token, 'secret', (err, user) => {
             if (err) {
-                console.log('토큰에러');
                 return res.sendStatus(403)
             } else {
-              console.log('정상토큰이다 ㅋㅋ')
-              console.log(user) //토큰 페이로드
-              req.user = user
-            next()
+                req.user = user
+                next()
             }
         })
     }
 }
-// JWT middleware End
+// JWT middleware End 
 
 
 //JWT refreshToken start
-
 app.post('/refreshToken', (req, res) => {
 
-  const refreshToken = req.body.refreshToken;
-  if (refreshToken === null) return res.sendStatus(401)
-  
-  user.findOne({ where: { refreshToken: refreshToken } })
-    .then((token) => {
-      if (token) {
-jwt.verify(refreshToken, 'secretRefresh', (err, reToken) => {
-  if (err) return res.sendStatus(403)
-        
-  const accessToken = jwt.sign({ email: reToken.email, userId: reToken.userId }, 'secret', { expiresIn: '600s' })
-  res.status(200).json({ msg: '토큰발급성공', accessToken: accessToken, id: reToken.userId })
-  })        
-      } else {
-        console.log('리프레시 토큰 요청에 대한 엑세스 토큰 발급 실패')
-     }
-    })
+    const refreshToken = req.body.refreshToken;
+    if (refreshToken === null) 
+        return res.sendStatus(401)
+
+    user
+        .findOne({
+            where: {
+                refreshToken: refreshToken
+            }
+        })
+        .then((token) => {
+            if (token) {
+                jwt.verify(refreshToken, 'secretRefresh', (err, reToken) => {
+                    if (err) 
+                        return res.sendStatus(403)
+
+                    const accessToken = jwt.sign({
+                        email: reToken.email,
+                        userId: reToken.userId
+                    }, 'secret', {expiresIn: '600s'})
+                    res
+                        .status(200)
+                        .json({msg: '토큰발급성공', accessToken: accessToken, id: reToken.userId})
+                })
+            } else {
+                console.log('리프레시 토큰 요청에 대한 엑세스 토큰 발급 실패')
+            }
+        })
 })
-
-
-//JWT refreshToken end
+//JWT refreshToken end 
 
 
 //signin test start
 app.get('/user', authenticateToken, (req, res) => {
- 
-     user
-                .findOne({
-                    where: {
-                        id: req.user.userId,
-                    }
-                })
-       .then((result) => {
-         return res.status(200).json(result);
-       }) 
-      .catch(err => {
-        console.error(err);
-        res.sendStatus(500); // Server error
-      });
-  })
-//signin test end
+
+    user
+        .findOne({
+            where: {
+                id: req.user.userId
+            }
+        })
+        .then((data) => {
+            return res
+                .status(200)
+                .json(data);
+        })
+        .catch(err => {
+            res
+                .status(500)
+                .send(err);
+        });
+})
+//signin test end 
 
 
 //signout start
 app.delete("/user/signout", authenticateToken, (req, res) => {
-      res.status(205).send('success logout')
-  });
-//signout end
+    res
+        .status(205)
+        .send("successfully signed out!")
+});
+//signout end 
 
 
 //post read start
 app.get('/post/read', (req, res) => {
-  post
+    post
         .findAll({
-             
+
             include: [
                 {
                     model: user,
                     required: false,
-                    attributes: ['email','username', 'userPhoto']
+                    attributes: ['email', 'username', 'userPhoto']
                 }, {
                     model: invention,
                     required: false,
-                    attributes: ['id','title','text', 'inventionPhoto']
+                    attributes: ['id', 'title', 'text', 'inventionPhoto']
                 }
             ],
-            raw: true, 
-            nest: true, 
+            raw: true,
+            nest: true
         })
         .then(data => {
             console.log(data);
@@ -216,270 +254,356 @@ app.get('/post/read', (req, res) => {
                 .send(data);
         })
         .catch(err => {
-            console.error(err);
-            res.sendStatus(500); 
+            res
+                .status(500)
+                .send(err);
         });
- })
-//post read end
+})
+//post read end 
 
 
 //post write start
-app.post('/post/write', authenticateToken,(req, res) => {  
-    post.
-    create({
-      text: req.body.text,
-      title: req.body.title,
-      userId: req.user.userId,
-      inventionId: req.body.postInfo 
+app.post('/post/write', authenticateToken, (req, res) => {
+    post
+        .create(
+            {text: req.body.text, title: req.body.title, userId: req.user.userId, inventionId: req.body.postInfo}
+        )
+        .then((data) => {
+            res
+                .status(201)
+                .json(data)
+        })
+        .catch((err) => {
+            res
+                .status(500)
+                .send(err);
+        })
     })
-    .then((data) => {
-      res.status(201).json(data)
-    })   .catch((err) => { res.status(500).send('글쓰기 에러ㅋㅋ') })    
-  })
-//post write end
+//post write end 
 
 
-//post edit start  
-app.put('/post/edit', authenticateToken,(req, res) => {
-    post.update({
-    text: req.body.text, 
-    title: req.body.title,
-  }, {
-    where: { id:req.body.postId, userId:req.user.userId, inventionId:req.body.inventionId }
-  })
- .then(result => {
-     res.status(201).json(result);
-  })
-  .catch(err => {
-     console.error(err);
-     console.log('글수정 실패 ㅋ')
-  });
+//post edit start
+app.put('/post/edit', authenticateToken, (req, res) => {
+    post
+        .update({
+            text: req.body.text,
+            title: req.body.title
+        }, {
+            where: {
+                id: req.body.postId,
+                userId: req.user.userId,
+                inventionId: req.body.inventionId
+            }
+        })
+        .then(data => {
+            res
+                .status(201)
+                .json(data);
+        })
+        .catch(err => {
+            res
+                .status(500)
+                .send(err);
+        });
 });
-//post edit end
+//post edit end 
 
 
-//post delete start  
-app.delete('/post/delete',authenticateToken, (req, res) => {
-    post.destroy({
-     where: { id:req.body.postId, userId:req.user.userId, inventionId:req.body.inventionId }
-  })
-    .then(() => {
-    res.status(201).send('success delete');
+//post delete start
+app.delete('/post/delete', authenticateToken, (req, res) => {
+    post
+        .destroy({
+            where: {
+                id: req.body.postId,
+                userId: req.user.userId,
+                inventionId: req.body.inventionId
+            }
+        })
+        .then(() => {
+            res
+                .status(200)
+                .send("successfully deleted!");
+        })
+        .catch(err => {
+            res
+                .status(500)
+                .send(err);
+        })
     })
-    .catch(err => {
-     console.error(err);
-    console.log('글삭제 실패 ㅋㅋ')
-  })
-    })
-//post delete end
+//post delete end 
 
 
 //post photo upload and edit start (+setting)
- const _storage = multer.diskStorage({
+const _storage = multer.diskStorage({
     destination: (req, file, cb) => {
-      cb(null, 'uploadPost/');
+        cb(null, 'uploadPost/');
     },
     filename: (req, file, cb) => {
-     cb(null, Date.now() +"-"+ file.originalname);
-    },
-  })
-const upload = multer({storage: _storage})//목적지
-  
+        cb(null, Date.now() + "-" + file.originalname);
+    }
+})
+const upload = multer({storage: _storage}) //목적지
+
 app.use('/uploadPost', express.static('uploadPost'));
 
-app.put('/post/upload', authenticateToken, upload.single('image'), (req, res) => {//엔포,미들웨어
-  post
-    .update({
-      postPhoto:'uploadPost/'+req.file.filename
-    },
-      {
-        where: {
-          id: req.body.postId, userId: req.user.userId, inventionId: req.body.postInfo
-}})
-    .then((data) => { 
-      console.log(data)
-      res.status(200).send(data)
-    })
-    .catch((err) =>
-    console.log('에러뜸'))
-})
-//post photo upload and edit end
+app.put(
+    '/post/upload',
+    authenticateToken,
+    upload.single('image'),
+    (req, res) => { //엔포,미들웨어
+        post
+            .update({
+                postPhoto: 'uploadPost/' + req.file.filename
+            }, {
+                where: {
+                    id: req.body.postId,
+                    userId: req.user.userId,
+                    inventionId: req.body.postInfo
+                }
+            })
+            .then((data) => {
+                console.log(data)
+                res
+                    .status(200)
+                    .send(data)
+            })
+            .catch(err => {
+                res
+                    .status(500)
+                    .send(err);
+            })
+        }
+)
+//post photo upload and edit end 
 
 
 //post photo delete start
-app.put('/post/upload/delete', authenticateToken, (req, res) => {//엔포,미들웨어
-  post
-    .update({
-      postPhoto:null
-    }, {
-      where: {
-        id: req.body.postId, userId: req.user.userId, inventionId: req.body.postInfo
-}})
-    .then((data) => { 
-      console.log(data)
-      res.status(200).send(data)
+app.put('/post/upload/delete', authenticateToken, (req, res) => { //엔포,미들웨어
+    post
+        .update({
+            postPhoto: null
+        }, {
+            where: {
+                id: req.body.postId,
+                userId: req.user.userId,
+                inventionId: req.body.postInfo
+            }
+        })
+        .then((data) => {
+            console.log(data)
+            res
+                .status(200)
+                .send(data)
+        })
+        .catch(err => {
+            res
+                .status(500)
+                .send(err);
+        })
     })
-    .catch((err) =>
-    console.log('에러뜸'))
-})
-//post photo delete end
+//post photo delete end 
 
 
 //profile read start
-app.get('/profile/read', authenticateToken,(req, res) => {
-     user
-                .findOne({
-                    where: {
-                        id: req.user.userId,
-                    }
-                })
-       .then((result) => {
-         return res.status(200).json(result);
-       }) 
-      .catch(err => {
-        console.error(err);
-        res.sendStatus(500); 
-      });
-  })
-//profile read end
+app.get('/profile/read', authenticateToken, (req, res) => {
+    user
+        .findOne({
+            where: {
+                id: req.user.userId
+            }
+        })
+        .then((data) => {
+            return res
+                .status(200)
+                .json(data);
+        })
+        .catch(err => {
+            res
+                .status(500)
+                .send(err);
+        })
+    })
+//profile read end 
 
 
 //profile password edit start
-app.put('/profile/edit/password', authenticateToken,(req, res) => {
- 
-    const salt = Math.round((new Date().valueOf() * Math.random))
-  const hashPwd = crypto.createHash("sha256").update(req.body.password+salt).digest("hex") 
+app.put('/profile/edit/password', authenticateToken, (req, res) => {
 
-    user.update({
-password:hashPwd 
-    }, {
-    where: { id:req.user.userId  } 
-  })
- .then(result => {
-     res.json(result);
-  })
-  .catch(err => {
-     console.error(err);
-     console.log('비번번경 성공 ㅋㅋㅋ')
-  });
-    
-});
-//profile password edit end
+    const salt = Math.round((new Date().valueOf() * Math.random))
+    const hashPwd = crypto
+        .createHash("sha256")
+        .update(req.body.password + salt)
+        .digest("hex")
+
+    user
+        .update({
+            password: hashPwd
+        }, {
+            where: {
+                id: req.user.userId
+            }
+        })
+        .then(() => {
+            res
+                .status(201)
+                .send("successfully edited password !");
+        })
+        .catch(err => {
+            res
+                .status(500)
+                .send(err);
+        })
+
+    });
+//profile password edit end 
 
 
 //profile(account) delete start
-app.delete('/profile/delete', authenticateToken,(req, res) => {
-    user.destroy({
-    where:{id:req.user.userId}//
-  })
-    .then((data) => {
-    res.redirect('/')
+app.delete('/profile/delete', authenticateToken, (req, res) => {
+    user
+        .destroy({
+            where: {
+                id: req.user.userId
+            } //
+        })
+        .then((data) => {
+            res
+                .status(200)
+                .send("successfully deleted!")
+            res.redirect('/')
+        })
+        .catch(err => {
+            res
+                .status(500)
+                .send(err);
+        })
     })
-    .catch(err => {
-     console.error(err);
-    console.log('계정삭제 실패 ㅋㅋ')
-  })
-})
-//profile delete end
+//profile delete end 
 
 
 //profile username edit start
-app.put('/profile/edit/username', authenticateToken,(req, res) => {
-    user.update({
-username:req.body.username  
-    }, {
-    where: { id:req.user.userId  }    
-  })
- .then(result => {
-     res.json(result);
-  })
-  .catch(err => {
-     console.error(err);
-     console.log('username 변경 성공 ㅋㅋㅋ')
-  });
-    
-});
-//profile username edit end
+app.put('/profile/edit/username', authenticateToken, (req, res) => {
+    user
+        .update({
+            username: req.body.username
+        }, {
+            where: {
+                id: req.user.userId
+            }
+        })
+        .then(data => {
+            res.json(data);
+        })
+        .catch(err => {
+            res
+                .status(500)
+                .send(err);
+        })
+
+    });
+//profile username edit end 
 
 
 //profile photo upload and edit start(+setting)
 const _storageprofile = multer.diskStorage({
     destination: (req, file, cb) => {
-      cb(null, 'uploadProfile/');
+        cb(null, 'uploadProfile/');
     },
     filename: (req, file, cb) => {
-     cb(null, Date.now() +"-"+ file.originalname);
-    },
-  })
-const uploadProfile = multer({storage: _storageprofile})//목적지
-  
+        cb(null, Date.now() + "-" + file.originalname);
+    }
+})
+const uploadProfile = multer({storage: _storageprofile}) //목적지
+
 app.use('/uploadProfile', express.static('uploadProfile'));
 
-app.put('/profile/upload', authenticateToken, uploadProfile.single('image'), (req, res) => {//엔포,미들웨어
+app.put(
+    '/profile/upload',
+    authenticateToken,
+    uploadProfile.single('image'),
+    (req, res) => { //엔포,미들웨어
 
-  user
-    .update({
-      userPhoto:'uploadProfile/'+req.file.filename
-    }, {where:{id: req.user.userId
-}})
-    .then((data) => { 
-      console.log(data)
-      res.status(200).send(data)
-    })
-    .catch((err) =>
-    console.log('에러뜸'))
-   })
-//profile photo upload and edit end
+        user
+            .update({
+                userPhoto: 'uploadProfile/' + req.file.filename
+            }, {
+                where: {
+                    id: req.user.userId
+                }
+            })
+            .then((data) => {
+                res
+                    .status(200)
+                    .send(data)
+            })
+            .catch(err => {
+                res
+                    .status(500)
+                    .send(err);
+            })
+        }
+)
+//profile photo upload and edit end 
 
 
 //profile photo delete start
-app.put('/profile/upload/delete', authenticateToken, (req, res) => {//엔포,미들웨어    
-  user
-    .update({
-      userPhoto:null
-    }, {where:{id: req.user.userId
-}})
-    .then((data) => { 
-      console.log(data)
-      res.status(200).send(data)
+app.put('/profile/upload/delete', authenticateToken, (req, res) => { //엔포,미들웨어
+    user
+        .update({
+            userPhoto: null
+        }, {
+            where: {
+                id: req.user.userId
+            }
+        })
+        .then(() => {
+            res
+                .status(200)
+                .send("successfully deleted!")
+        })
+        .catch(err => {
+            res
+                .status(500)
+                .send(err);
+        })
     })
-    .catch((err) =>
-    console.log('에러뜸'))
-   })
-//profile photo delete end
+//profile photo delete end 
 
 
 //invention read start
 app.get('/invention/:id', (req, res) => {
-  const inventionId = req.params.id
+    const inventionId = req
+        .params
+        .id
 
-  invention.findOne({ where: {id:inventionId}})
-                     .then(data => {
+        invention
+        .findOne({
+            where: {
+                id: inventionId
+            }
+        })
+        .then(data => {
             console.log(data);
             return res
                 .status(200)
                 .send(data);
         })
         .catch(err => {
-            console.error(err);
-            res.sendStatus(500); // Server error
-        });
-})
+            res
+                .status(500)
+                .send(err);
+        })
+    })
 //invention read end
 
-
-
-
 app.get('/', (req, res) => {
-console.log(__dirname)  
-  post.findAll().then(data=> res.status(200).send(data))
+    console.log(__dirname)
+    post
+        .findAll()
+        .then(data => res.status(200).send(data))
 
 })
 
-
-
-
-
 app.listen(port, () => {
-  console.log(`Example app listening at http://localhost:${port}`)
+    console.log(`Example app listening at http://localhost:${port}`)
 })
