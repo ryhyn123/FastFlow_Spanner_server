@@ -218,7 +218,6 @@ app.put('/post/edit', authenticateToken,(req, res) => {
     post.update({
     text: req.body.text, 
     title: req.body.title,
-    postPhoto: req.body.postPhoto
   }, {
     where: { id:req.body.postId, userId:req.user.userId, inventionId:req.body.inventionId }
   })
