@@ -20,6 +20,9 @@ module.exports = {
       userPhoto: {
         type: Sequelize.STRING
       },
+      refreshToken: {
+        type: Sequelize.STRING
+      },
       is_social: {
         type: Sequelize.BOOLEAN
       },
