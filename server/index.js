@@ -140,50 +140,23 @@ function authenticateToken(req, res, next) {
 //JWT refreshToken start
 
 app.post('/refreshToken', (req, res) => {
-  // const refreshToken = req.body.refreshToken;
-  // console.log('요청 온 리프레시토큰',refreshToken)
-  // if (refreshToken === null) return res.sendStatus(401)
-  
-  // user.findOne({ where: { id : 3 } })
-  //   .then((token) => {
-  //     console.log('디비 테크 후 토큰=>',token.dataValues.refreshToken)
-  //     if (token.dataValues.refreshToken === refreshToken) {
-  //       console.log('findone으로 리프레시토큰 찾고난 결과,=>', token)
-  //       accessToken = jwt.sign({ email: token.email, userId: token.id }, 'secret', { expiresIn: '600s' })
 
-  //     res.status(200).json({msg: '토큰발급성공', accessToken: accessToken, id: data.id })
-      
-  //     } else {
-  //       console.log('리프레시 토큰 요청 후 테스트한 엑세스토큰 발급실패')
-  //    }
-  //   })
-  const refreshToken = req.body.data.refreshToken;
-  console.log('요청 온 리프레시토큰',refreshToken)
+  const refreshToken = req.body.refreshToken;
   if (refreshToken === null) return res.sendStatus(401)
   
-  user.findOne({ where: { refreshToken: req.body.data.refreshToken } })
+  user.findOne({ where: { refreshToken: refreshToken } })
     .then((token) => {
-      console.log('디비 테크 후 토큰=>',token)
       if (token) {
-        console.log('findone으로 리프레시토큰 찾고난 결과,=>', token)
-        accessToken = jwt.sign({ email: token.email, userId: token.id }, 'secret', { expiresIn: '600s' })
-
-      res.status(200).json({msg: '토큰발급성공', accessToken: accessToken, id: data.id })
-      
+jwt.verify(refreshToken, 'secretRefresh', (err, reToken) => {
+  if (err) return res.sendStatus(403)
+        
+  const accessToken = jwt.sign({ email: reToken.email, userId: reToken.userId }, 'secret', { expiresIn: '600s' })
+  res.status(200).json({ msg: '토큰발급성공', accessToken: accessToken, id: reToken.userId })
+  })        
       } else {
-        console.log('리프레시 토큰 요청 후 테스트한 엑세스토큰 발급실패')
+        console.log('리프레시 토큰 요청에 대한 엑세스 토큰 발급 실패')
      }
     })
-  
-
-  // const hashReT=jwt.verify(refreshToken, 'secretRefresh', (err, reToken) => {
-  //   if (err) console.log('hashRet에러')//return res.sendStatus(403)
-  //   console.log('해싱된 리프레시토큰', reToken)
-  // })
-  // console.log('해싱된 리프레시토큰', hashReT)
-  
-  
- 
 })
 
 
