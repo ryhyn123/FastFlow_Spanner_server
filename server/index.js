@@ -1,6 +1,6 @@
 const express = require('express')
 const app = express()
-const port = 3000
+const port = 443
 const {user} = require('./models');
 const {post} = require('./models');
 const { invention } = require('./models');
@@ -9,6 +9,19 @@ const cors = require("cors");
 const crypto = require("crypto")
 const jwt = require('jsonwebtoken')
 const multer = require('multer')
+const https = require('https')
+const fs = require('fs')
+require("dotenv").config();
+
+//https test start
+
+const options = {
+  key : fs.readFileSync(__dirname + '/pem/key.pem'),
+  cert : fs.readFileSync(__dirname + '/pem/cert.pem')
+}
+
+//https test end
+
 
 
 //middleware start
@@ -205,7 +218,6 @@ app.put('/post/edit', authenticateToken,(req, res) => {
     post.update({
     text: req.body.text, 
     title: req.body.title,
-    postPhoto: req.body.postPhoto
   }, {
     where: { id:req.body.postId, userId:req.user.userId, inventionId:req.body.inventionId }
   })
@@ -431,11 +443,31 @@ app.get('/invention', (req, res) => {
 
 
 app.get('/', (req, res) => {
-  
+console.log(__dirname)  
   post.findAll().then(data=> res.status(200).send(data))
 
 })
 
-app.listen(port, () => {
+
+
+//https test start 
+//.env
+
+// https.createServer({key:process.env.PEM_KEY, cert:process.env.PEM_CERT}, app.listen(port, () => {
+//   console.log(`Example app listening at http://localhost:${port}`)
+// }))
+
+//file
+
+https.createServer(options, app).listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`)
 })
+
+
+//https test end
+
+
+
+// app.listen(port, () => {
+//   console.log(`Example app listening at http://localhost:${port}`)
+// })
