@@ -9,18 +9,7 @@ const cors = require("cors");
 const crypto = require("crypto")
 const jwt = require('jsonwebtoken')
 const multer = require('multer')
-const https = require('https')
-const fs = require('fs')
-require("dotenv").config();
 
-//https test start
-
-const options = {
-  key : fs.readFileSync(__dirname + '/pem/key.pem'),
-  cert : fs.readFileSync(__dirname + '/pem/cert.pem')
-}
-
-//https test end
 
 
 
@@ -452,24 +441,8 @@ console.log(__dirname)
 
 
 
-//https test start 
-//.env
 
-// https.createServer({key:process.env.PEM_KEY, cert:process.env.PEM_CERT}, app.listen(port, () => {
-//   console.log(`Example app listening at http://localhost:${port}`)
-// }))
 
-//file
-
-https.createServer(options, app).listen(port, () => {
+app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`)
 })
-
-
-//https test end
-
-
-
-// app.listen(port, () => {
-//   console.log(`Example app listening at http://localhost:${port}`)
-// })
