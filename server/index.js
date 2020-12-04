@@ -450,8 +450,10 @@ app.put('/profile/upload/delete', authenticateToken, (req, res) => {//엔포,미
 
 
 //invention read start
-app.get('/invention', (req, res) => {
-  invention.findAll()
+app.get('/invention/:id', (req, res) => {
+  const inventionId = req.params.id
+
+  invention.findOne({ where: {id:inventionId}})
                      .then(data => {
             console.log(data);
             return res
