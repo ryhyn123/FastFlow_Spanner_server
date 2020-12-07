@@ -119,7 +119,7 @@ module.exports = {
       .send("successfully signed out!")
   },
  
-  help: (req, res) => {
+  userinfo: (req, res) => {
    
     user
         .findOne({
