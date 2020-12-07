@@ -13,8 +13,8 @@ router.post("/signin", userController.signin);
 // //signout 
 router.delete("/signout", authenticateToken.authenticateToken, userController.signout);
 
-//login help (client)
-router.get('/', authenticateToken.authenticateToken, userController.help)
+//userinfo
+router.get('/', authenticateToken.authenticateToken, userController.userinfo)
  
 
 module.exports = router;

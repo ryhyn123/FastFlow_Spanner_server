@@ -39,15 +39,92 @@ app.use('/refreshToken', refreshTokenRouter)
 
 
 
- 
-
+//root url TEST 
 app.get('/', (req, res) => {
-    console.log('루트 URL TEST')
     post
         .findAll()
         .then(data => res.status(200).send(data))
-
 })
+
+
+//social signin (github, kakao) , MVC after TEST
+//social signin (github, kakao) , MVC after TEST
+//social signin (github, kakao) , MVC after TEST
+
+
+const axios = require( "axios");
+//깃허브 로그인테스트
+//깃허브 로그인테스트
+//깃허브 로그인테스트
+
+app.post('/github/auth', async (req, res) => {
+  const response = await axios.post(
+    'https://github.com/login/oauth/access_token',
+    {
+      code:req.body.code,
+      client_id:'db63ccbb62de73c0baac',
+      client_secret:'d53d922b996a2ddfcd9c596e86d110f979eaea43',
+    },
+    {
+      headers: {
+        accept: 'application/json',
+      }
+    }
+  );
+  const token = response.data.access_token;
+  const { githubUser } = await axios.get('https://api.github.com/user', {
+    headers: {
+      Authorization: `token ${token}`,
+    },
+  })  
+  
+  axios.post('http://localhost:3000/user/signup', {
+    email: `Github_${githubUser.id}`,
+    username: `${githubUser.login}`,
+    password: `${githubUser.id}`
+  })
+
+  let result = axios.post('http://localhost:3000/user/signin', {
+        email: `Github_${githubUser.id}`,
+        password: `${githubUser.id}`,
+      })
+
+  return res.status(201).send(result.githubUser.accessToken);
+    
+})
+
+///////카카오 테스트
+///////카카오 테스트
+///////카카오 테스트
+
+app.post('/kakao/auth', async (req, res) => { 
+  const kakaoUser = await axios.get('https://kapi.kakao.com/v2/user/me', {
+    headers: {
+     Authorization: `Bearer ${req.body.token}`
+  }
+   
+})
+
+  await axios.post('http://localhost:3000/user/signup', {
+    email: `Kakao_${kakaoUser.data.id}`,
+    username: `${kakaoUser.data.properties.nickname}`,
+    password: `${kakaoUser.data.id}`
+  })
+
+  await axios.post('http://localhost:3000/user/signin', {
+      email: `Kakao_${kakaoUser.data.id}`,
+        password: `${kakaoUser.data.id}`,
+  })
+  
+console.log(`req.body.token=>${req.body.token}`)
+  return res.status(201).send(req.body.token);
+  
+})
+
+
+
+
+
 
 app.listen(port, () => {
     console.log(`Example app listening at http://localhost:${port}`)
