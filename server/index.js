@@ -1,6 +1,6 @@
 const express = require('express')
 const app = express()
-const port = 3000
+const port = 443
 //const {user} = require('./models');
 const {post} = require('./models');
 //const {invention} = require('./models');
@@ -17,13 +17,24 @@ const inventionRouter = require('./routes/invention')
 const refreshTokenRouter = require('./routes/refreshToken')
 
 
+//https 1/3
+const path = require('path')
+const https = require('https')
+const fs = require('fs')
+const options = {
+    key: fs.readFileSync(__dirname + '/pem/key.pem'),
+    cert: fs.readFileSync(__dirname + '/pem/cert.pem')
+    
+}
+
+
 //middleware
 app.use(bodyParser.json());
 
 app.use(cors({
-    //  origin: ["http://spanner.s3-website.ap-northeast-2.amazonaws.com"],
+      origin: ["http://spanner.s3-website.ap-northeast-2.amazonaws.com"],
 
-    origin: ["http://localhost:3001"],
+  //  origin: ["http://localhost:3001"],
     method: [
         "GET", "POST", "PUT", "DELETE"
     ],
@@ -37,6 +48,11 @@ app.use('/profile', profileRouter)
 app.use('/invention', inventionRouter)
 app.use('/refreshToken', refreshTokenRouter)
 
+//https 2/3
+app.use("/", express.static(__dirname + "/public"))
+app.get("/*", function (req, res) {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+});
 
 
 //root url TEST 
@@ -65,8 +81,8 @@ app.post('/github/auth', async (req, res) => {
     'https://github.com/login/oauth/access_token',
     {
       code:req.body.code,
-      client_id:'db63ccbb62de73c0baac',
-      client_secret:'d53d922b996a2ddfcd9c596e86d110f979eaea43',
+      client_id:'',
+      client_secret:'',
     },
     {
       headers: {
@@ -83,14 +99,16 @@ app.post('/github/auth', async (req, res) => {
   })  
   
 //console.log('회원가입전')
-axios.post('http://localhost:3000/user/signup', {
+//axios.post('http://localhost:3000/user/signup', {
+axios.post('https://spanner.ga:443/user/signup', {
     email: `Github_${githubUser.data.id}`,
     username: `${githubUser.data.login}`,
     password: `${githubUser.data.id}`
   })
 //console.log('회원가입후')
 //console.log('로그인 전')
- axios.post('http://localhost:3000/user/signin', {
+ //axios.post('http://localhost:3000/user/signin', {
+ axios.post('https://spanner.ga:443/user/signin', {
         email: `Github_${githubUser.data.id}`,
         password: `${githubUser.data.id}`,
       })
@@ -115,15 +133,17 @@ app.post('/kakao/auth', async (req, res) => {
     console.log(`kakaoUserkakaoUser=>${kakaoUser.data.id}`)
 //console.log('회원가입전')
 
-  axios.post('http://localhost:3000/user/signup', {
+//  axios.post('http://localhost:3000/user/signup', {
+  axios.post('https://spanner.ga:443/user/signup', {
     email: `Kakao_${kakaoUser.data.id}`,
     username: `${kakaoUser.data.properties.nickname}`,
     password: `${kakaoUser.data.id}`
   })
-//console.log('회원가입후')
+console.log('회원가입후')
 //console.log('로그인 전')
 
-  axios.post('http://localhost:3000/user/signin', {
+//  axios.post('http://localhost:3000/user/signin', {
+  axios.post('https://spanner.ga:443/user/signin', {
       email: `Kakao_${kakaoUser.data.id}`,
         password: `${kakaoUser.data.id}`,
   })
@@ -141,7 +161,11 @@ app.post('/kakao/auth', async (req, res) => {
 
 
 
-app.listen(port, () => {
+// app.listen(port, () => {
+//     console.log(`Example app listening at http://localhost:${port}`)
+// })
+
+//https 3/3
+https.createServer(options, app).listen(port, () => {
     console.log(`Example app listening at http://localhost:${port}`)
 })
-
