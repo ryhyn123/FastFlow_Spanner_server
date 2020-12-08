@@ -6,7 +6,7 @@ const jwt = require('jsonwebtoken')
 module.exports = {
 
   signup:(req, res) => {
-
+console.log('요청옴')
     const { email, password, username } = req.body;
     
     const salt = Math.round((new Date().valueOf() * Math.random))
