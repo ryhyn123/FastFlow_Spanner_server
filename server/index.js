@@ -100,7 +100,7 @@ app.post('/github/auth', async (req, res) => {
   
 //console.log('회원가입전')
 //axios.post('http://localhost:3000/user/signup', {
-axios.post('https://spanner.ga:443/user/signup', {
+axios.post('https://spanner.cf:443/user/signup', {
     email: `Github_${githubUser.data.id}`,
     username: `${githubUser.data.login}`,
     password: `${githubUser.data.id}`
@@ -108,7 +108,7 @@ axios.post('https://spanner.ga:443/user/signup', {
 //console.log('회원가입후')
 //console.log('로그인 전')
  //axios.post('http://localhost:3000/user/signin', {
- axios.post('https://spanner.ga:443/user/signin', {
+ axios.post('https://spanner.cf:443/user/signin', {
         email: `Github_${githubUser.data.id}`,
         password: `${githubUser.data.id}`,
       })
@@ -134,7 +134,7 @@ app.post('/kakao/auth', async (req, res) => {
 //console.log('회원가입전')
 
 //  axios.post('http://localhost:3000/user/signup', {
-  axios.post('https://spanner.ga:443/user/signup', {
+  axios.post('https://spanner.cf:443/user/signup', {
     email: `Kakao_${kakaoUser.data.id}`,
     username: `${kakaoUser.data.properties.nickname}`,
     password: `${kakaoUser.data.id}`
@@ -143,7 +143,7 @@ console.log('회원가입후')
 //console.log('로그인 전')
 
 //  axios.post('http://localhost:3000/user/signin', {
-  axios.post('https://spanner.ga:443/user/signin', {
+  axios.post('https://spanner.cf:443/user/signin', {
       email: `Kakao_${kakaoUser.data.id}`,
         password: `${kakaoUser.data.id}`,
   })
