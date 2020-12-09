@@ -33,7 +33,7 @@ const options = {
 app.use(bodyParser.json());
 
 app.use(cors({
-      origin: ["http://spanner.s3-website.ap-northeast-2.amazonaws.com"],
+      origin: ["https://www.spanner.cf"],
 
    // origin: ["http://localhost:3001"],
     method: [
