@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router();
-const authenticateToken = require('../middleware/middleware')
+const authenticateToken = require('../middleware/jwt')
 const postController = require('../controllers/postController')
 const multer = require('multer')
 
@@ -14,8 +14,6 @@ const _storage = multer.diskStorage({
     }
 })
 const upload = multer({storage: _storage})
-
-router.use('/uploadPost', express.static('uploadPost'));
 
 
 //post read
