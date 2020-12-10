@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router();
-const authenticateToken = require('../middleware/middleware')
+const authenticateToken = require('../middleware/jwt')
 const profileController = require('../controllers/profileController')
 const multer = require('multer')
 
@@ -14,8 +14,6 @@ const _storageprofile = multer.diskStorage({
     }
 })
 const uploadProfile = multer({storage: _storageprofile}) 
-
-router.use('/uploadProfile', express.static('uploadProfile'));
 
 
 //profile read
