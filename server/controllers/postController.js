@@ -5,10 +5,12 @@ const {invention} = require('../models');
 
 module.exports = {
 
-read:(req, res) => {
+    read: (req, res) => {
     post
         .findAll({
-
+            where: {
+  inventionId : req.params.id  
+},
             include: [
                 {
                     model: user,

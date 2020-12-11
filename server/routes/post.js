@@ -17,7 +17,7 @@ const upload = multer({storage: _storage})
 
 
 //post read
-router.get('/read', postController.read)
+router.get('/read/:id', postController.read)
 
 //post write
 router.post('/write', authenticateToken.authenticateToken, postController.write)
