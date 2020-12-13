@@ -1,8 +1,8 @@
 const express = require('express')
 const app = express()
-const port = 3000
-//const port = 443
-const {user} = require('./models');
+//const port = 3000
+const port = 443
+//const {user} = require('./models');
 const {post} = require('./models');
 //const {invention} = require('./models');
 const bodyParser = require("body-parser");
@@ -23,9 +23,9 @@ const socialAuthRouter = require('./routes/socialAuth')
 app.use(bodyParser.json());
 
 app.use(cors({
-  //    origin: ["https://www.spanner.cf"],
+      origin: ["https://www.spanner.cf"],
 
-    origin: ["http://localhost:3001"],
+  //  origin: ["http://localhost:3001"],
     method: [
         "GET", "POST", "PUT", "DELETE"
     ],
@@ -60,28 +60,28 @@ app.get('/', (req, res) => {
 
 
 
-app.listen(port, () => {
-    console.log(`Example app listening at http://localhost:${port}`)
- })
+// app.listen(port, () => {
+//     console.log(`Example app listening at http://localhost:${port}`)
+//  })
 
 
  // //https 1/3
-// const path = require('path')
-// const https = require('https')
-// const fs = require('fs')
-// const options = {
-//     key: fs.readFileSync(__dirname + '/pem/key.pem'),
-//     cert: fs.readFileSync(__dirname + '/pem/cert.pem')
+const path = require('path')
+const https = require('https')
+const fs = require('fs')
+const options = {
+    key: fs.readFileSync(__dirname + '/pem/key.pem'),
+    cert: fs.readFileSync(__dirname + '/pem/cert.pem')
     
-// }
+}
 
 // //https 2/3
-// app.use("/", express.static(__dirname + "/public"))
-// app.get("/*", function (req, res) {
-//   res.sendFile(path.join(__dirname, "public", "index.html"));
-// });
+app.use("/", express.static(__dirname + "/public"))
+app.get("/*", function (req, res) {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+});
 
 // //https 3/3
-// https.createServer(options, app).listen(port, () => {
-//     console.log(`Example app listening at http://localhost:${port}`)
-// })
+https.createServer(options, app).listen(port, () => {
+    console.log(`Example app listening at https://spanner.cf:${port}`)
+})
