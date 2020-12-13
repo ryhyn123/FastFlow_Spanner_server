@@ -17,6 +17,16 @@ const profileRouter = require('./routes/profile')
 const inventionRouter = require('./routes/invention')
 const refreshTokenRouter = require('./routes/refreshToken')
 const socialAuthRouter = require('./routes/socialAuth')
+ // //https 1/3
+const path = require('path')
+const https = require('https')
+const fs = require('fs')
+const options = {
+    key: fs.readFileSync(__dirname + '/pem/key.pem'),
+    cert: fs.readFileSync(__dirname + '/pem/cert.pem')
+    
+}
+
 
 
 //middleware
@@ -47,6 +57,11 @@ app.use('/refreshToken', refreshTokenRouter)
 app.use('/socialAuth', socialAuthRouter)
 
 
+// //https 2/3
+app.use("/", express.static(__dirname + "/public"))
+app.get("/*", function (req, res) {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+});
 
 
 //root url TEST 
@@ -65,21 +80,6 @@ app.get('/', (req, res) => {
 //  })
 
 
- // //https 1/3
-const path = require('path')
-const https = require('https')
-const fs = require('fs')
-const options = {
-    key: fs.readFileSync(__dirname + '/pem/key.pem'),
-    cert: fs.readFileSync(__dirname + '/pem/cert.pem')
-    
-}
-
-// //https 2/3
-app.use("/", express.static(__dirname + "/public"))
-app.get("/*", function (req, res) {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
-});
 
 // //https 3/3
 https.createServer(options, app).listen(port, () => {
