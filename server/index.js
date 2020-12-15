@@ -17,7 +17,7 @@ const profileRouter = require('./routes/profile')
 const inventionRouter = require('./routes/invention')
 const refreshTokenRouter = require('./routes/refreshToken')
 const socialAuthRouter = require('./routes/socialAuth')
- // //https 1/3
+//  // //https 1/3
 const path = require('path')
 const https = require('https')
 const fs = require('fs')
@@ -35,7 +35,7 @@ app.use(bodyParser.json());
 app.use(cors({
       origin: ["https://www.spanner.cf"],
 
-  //  origin: ["http://localhost:3001"],
+    // origin: ["http://localhost:3001"],
     method: [
         "GET", "POST", "PUT", "DELETE"
     ],
@@ -57,7 +57,7 @@ app.use('/refreshToken', refreshTokenRouter)
 app.use('/socialAuth', socialAuthRouter)
 
 
-// //https 2/3
+// // //https 2/3
 app.use("/", express.static(__dirname + "/public"))
 app.get("/*", function (req, res) {
   res.sendFile(path.join(__dirname, "public", "index.html"));

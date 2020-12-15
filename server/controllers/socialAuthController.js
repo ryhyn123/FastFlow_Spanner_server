@@ -27,7 +27,7 @@ module.exports = {
     
   },
   
-  github:async (req, res) => {
+  github: async (req, res) => {
   const response = await axios.post(
     'https://github.com/login/oauth/access_token',
     {

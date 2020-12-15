@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/static/css/main.6d8ec9d6.chunk.css",
-    "main.js": "/static/js/main.af954f6f.chunk.js",
-    "main.js.map": "/static/js/main.af954f6f.chunk.js.map",
+    "main.js": "/static/js/main.2e26a7f4.chunk.js",
+    "main.js.map": "/static/js/main.2e26a7f4.chunk.js.map",
     "runtime-main.js": "/static/js/runtime-main.120840cb.js",
     "runtime-main.js.map": "/static/js/runtime-main.120840cb.js.map",
-    "static/js/2.8bb3d6e0.chunk.js": "/static/js/2.8bb3d6e0.chunk.js",
-    "static/js/2.8bb3d6e0.chunk.js.map": "/static/js/2.8bb3d6e0.chunk.js.map",
+    "static/js/2.2e2fee0d.chunk.js": "/static/js/2.2e2fee0d.chunk.js",
+    "static/js/2.2e2fee0d.chunk.js.map": "/static/js/2.2e2fee0d.chunk.js.map",
     "index.html": "/index.html",
     "static/css/main.6d8ec9d6.chunk.css.map": "/static/css/main.6d8ec9d6.chunk.css.map",
-    "static/js/2.8bb3d6e0.chunk.js.LICENSE.txt": "/static/js/2.8bb3d6e0.chunk.js.LICENSE.txt",
+    "static/js/2.2e2fee0d.chunk.js.LICENSE.txt": "/static/js/2.2e2fee0d.chunk.js.LICENSE.txt",
     "static/media/index.css": "/static/media/vaccine_BG2.5634d34f.jpg",
     "static/media/AirplaneDetail.1c21242c.gif": "/static/media/AirplaneDetail.1c21242c.gif",
     "static/media/Banana.4a458f26.png": "/static/media/Banana.4a458f26.png",
@@ -76,8 +76,8 @@
   },
   "entrypoints": [
     "static/js/runtime-main.120840cb.js",
-    "static/js/2.8bb3d6e0.chunk.js",
+    "static/js/2.2e2fee0d.chunk.js",
     "static/css/main.6d8ec9d6.chunk.css",
-    "static/js/main.af954f6f.chunk.js"
+    "static/js/main.2e26a7f4.chunk.js"
   ]
 }
