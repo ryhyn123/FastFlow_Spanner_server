@@ -19,9 +19,9 @@ module.exports = {
         })
         .then((data) => {
             if (!data) {
-                return res.status(201).json({ userInfo:kakaoUser.data, userChcek:true });       
+                return res.status(201).json({ userInfo:kakaoUser.data, userCheck:true });       
             }
-                    return res.status(201).json({ userInfo:kakaoUser.data, userChcek:false });
+                    return res.status(201).json({ userInfo:kakaoUser.data, userCheck:false });
         
         })
     
@@ -57,9 +57,9 @@ module.exports = {
         })
         .then((data) => {
             if (!data) {
-                return res.status(201).json({ userInfo:githubUser.data, userChcek:true });       
+                return res.status(201).json({ userInfo:githubUser.data, userCheck:true });       
             }
-                    return res.status(201).json({ userInfo:githubUser.data, userChcek:false });
+                    return res.status(201).json({ userInfo:githubUser.data, userCheck:false });
         
         })
     
