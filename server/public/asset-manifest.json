@@ -1,17 +1,15 @@
 {
   "files": {
-    "main.css": "/static/css/main.56c64818.chunk.css",
-    "main.js": "/static/js/main.d96b0ed6.chunk.js",
-    "main.js.map": "/static/js/main.d96b0ed6.chunk.js.map",
+    "main.css": "/static/css/main.12fe440b.chunk.css",
+    "main.js": "/static/js/main.e7484ca3.chunk.js",
+    "main.js.map": "/static/js/main.e7484ca3.chunk.js.map",
     "runtime-main.js": "/static/js/runtime-main.120840cb.js",
     "runtime-main.js.map": "/static/js/runtime-main.120840cb.js.map",
-    "static/css/2.165ff965.chunk.css": "/static/css/2.165ff965.chunk.css",
-    "static/js/2.d0feb660.chunk.js": "/static/js/2.d0feb660.chunk.js",
-    "static/js/2.d0feb660.chunk.js.map": "/static/js/2.d0feb660.chunk.js.map",
+    "static/js/2.21b4af0c.chunk.js": "/static/js/2.21b4af0c.chunk.js",
+    "static/js/2.21b4af0c.chunk.js.map": "/static/js/2.21b4af0c.chunk.js.map",
     "index.html": "/index.html",
-    "static/css/2.165ff965.chunk.css.map": "/static/css/2.165ff965.chunk.css.map",
-    "static/css/main.56c64818.chunk.css.map": "/static/css/main.56c64818.chunk.css.map",
-    "static/js/2.d0feb660.chunk.js.LICENSE.txt": "/static/js/2.d0feb660.chunk.js.LICENSE.txt",
+    "static/css/main.12fe440b.chunk.css.map": "/static/css/main.12fe440b.chunk.css.map",
+    "static/js/2.21b4af0c.chunk.js.LICENSE.txt": "/static/js/2.21b4af0c.chunk.js.LICENSE.txt",
     "static/media/AirplaneDetail.1c21242c.gif": "/static/media/AirplaneDetail.1c21242c.gif",
     "static/media/BatteryDetail.42f89bde.gif": "/static/media/BatteryDetail.42f89bde.gif",
     "static/media/Condom0.01a67a43.png": "/static/media/Condom0.01a67a43.png",
@@ -75,7 +73,6 @@
     "static/media/refrigerator_scenary.71f608a0.gif": "/static/media/refrigerator_scenary.71f608a0.gif",
     "static/media/refrigerator_squish.fa206f5c.png": "/static/media/refrigerator_squish.fa206f5c.png",
     "static/media/refrigerator_vertical.b41359eb.gif": "/static/media/refrigerator_vertical.b41359eb.gif",
-    "static/media/slick-theme.css": "/static/media/slick.c94f7671.ttf",
     "static/media/smoke.3bd21b49.png": "/static/media/smoke.3bd21b49.png",
     "static/media/starlight1.8c3daaf3.png": "/static/media/starlight1.8c3daaf3.png",
     "static/media/starlight2.194e3c51.png": "/static/media/starlight2.194e3c51.png",
@@ -87,9 +84,8 @@
   },
   "entrypoints": [
     "static/js/runtime-main.120840cb.js",
-    "static/css/2.165ff965.chunk.css",
-    "static/js/2.d0feb660.chunk.js",
-    "static/css/main.56c64818.chunk.css",
-    "static/js/main.d96b0ed6.chunk.js"
+    "static/js/2.21b4af0c.chunk.js",
+    "static/css/main.12fe440b.chunk.css",
+    "static/js/main.e7484ca3.chunk.js"
   ]
 }
