@@ -32,7 +32,7 @@ router.put('/edit/username', authenticateToken.authenticateToken, profileControl
 router.put('/upload',authenticateToken.authenticateToken, uploadProfile.single('image'), profileController.upload)
 
 //profile photo delete
-router.put('/upload/delete', authenticateToken.authenticateToken, profileController.uploadDelte)
+router.put('/upload/delete', authenticateToken.authenticateToken, profileController.uploadDelete)
 
 
 module.exports = router;

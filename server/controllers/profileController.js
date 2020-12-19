@@ -40,7 +40,7 @@ module.exports = {
         .then(() => {
             res
                 .status(201)
-                .send("successfully edited password !");
+                .send("비밀번호가 성공적으로 변경되었습니다^^");
         })
         .catch(err => {
             res
@@ -112,7 +112,7 @@ module.exports = {
             })
   },
   
-  uploadDelte:(req, res) => {  
+  uploadDelete:(req, res) => {  
     user
         .update({
             userPhoto: null
